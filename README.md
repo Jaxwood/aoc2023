@@ -1,12 +1,4 @@
-# 🌈 Minimal Ruby Project
-
-A template for your Ruby project!
-
-# Features
-
-* Basic project structure 
-* Rakefile and test helper to run tests
-* Github Action workflow 
+# Advent of Code 2023
 
 # Set up
 

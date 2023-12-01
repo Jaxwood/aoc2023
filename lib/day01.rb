@@ -19,7 +19,7 @@ class Day01
   end
 
   def sum_line(line)
-    nums = line.scan(/-?\d/).map(&:to_i)
+    nums = line.scan(/\d/).map(&:to_i)
     nums.first * 10 + nums.last
   end
 

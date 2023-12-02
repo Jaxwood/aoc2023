@@ -80,6 +80,22 @@ class Day02
   end
 
   def part2
-    0
+    sum = 0
+    games = []
+    @lines.each do |line|
+      games << parse(line)
+    end
+    games.each do |g|
+      max_blue = 0
+      max_green = 0
+      max_red = 0
+      g.rounds.each do |r|
+        max_blue = [max_blue, r.blue].max
+        max_green = [max_green, r.green].max
+        max_red = [max_red, r.red].max
+      end
+      sum += max_blue * max_green * max_red
+    end
+    sum
   end
 end

@@ -80,7 +80,7 @@ class Day03
           # parse number
           if not from.nil?
             if is_valid?(map, from, x - 1, y)
-              nums << parse_number(map, from, x, y)
+              nums << parse_number(map, from, x - 1, y)
             end
             from = nil
           end

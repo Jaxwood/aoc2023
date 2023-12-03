@@ -1,6 +1,7 @@
 class Day03
   def load(file)
     @lines = File.readlines(file)
+    @neighbors = [[1,0], [-1,0], [0,1], [0,-1], [1,1], [-1,-1], [1,-1], [-1,1]]
   end
 
   def parse(line)
@@ -26,8 +27,6 @@ class Day03
   end
 
   def is_valid?(map, from, to, y)
-    neighbors = [[1,0], [-1,0], [0,1], [0,-1], [1,1], [-1,-1], [1,-1], [-1,1]]
-
     # check if next to the number 
     if map.key?([from-1,y]) 
       if valid_char?(map[[from-1,y]])
@@ -42,7 +41,7 @@ class Day03
     end
 
     for x in from..to
-      for n in neighbors
+      for n in @neighbors
         if map.key?([x+n[0],y+n[1]])
           if y+n[1] != y
             if valid_char?(map[[x+n[0],y+n[1]]])
@@ -53,6 +52,19 @@ class Day03
       end
     end
     false
+  end
+
+  def boundary(map, candidate)
+    from = candidate[0]
+    to = candidate[0]
+    y = candidate[1]
+    while map.key?([from-1,y]) and map[[from-1,y]].match?(/\d/)
+      from -= 1
+    end
+    while map.key?([to+1,y]) and map[[to+1,y]].match?(/\d/)
+      to += 1
+    end
+    [from, to]
   end
 
   def part1
@@ -86,4 +98,37 @@ class Day03
     end
     nums.sum
   end
+
+  def part2
+    map = parse(@lines)
+    stars = []
+    for y in 0..@lines.length-1
+      for x in 0..@lines[y].length-2
+        if map[[x,y]] == "*"
+          stars << [x,y]
+        end
+      end
+    end
+
+    sum = 0
+    for star in stars
+      # using a set can potentially fail if two numbers next to each other
+      # have the same value. This is not the case in my input data.
+      nums = Set.new
+      for n in @neighbors
+        candidate = [star[0]+n[0],star[1]+n[1]]
+        if map.key?(candidate)
+          if map[candidate].match?(/\d/)
+            num = boundary(map, candidate)
+            nums.add(parse_number(map, num[0], num[1], star[1]+n[1]))
+          end
+        end
+      end
+      if nums.length == 2
+        sum += nums.reduce(:*)
+      end
+    end
+    sum
+  end
 end
+

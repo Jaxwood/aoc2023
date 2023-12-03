@@ -22,10 +22,7 @@ class Day03
   end
 
   def valid_char?(candidate)
-    if candidate != "." and !candidate.match?(/\d/)
-      return true
-    end
-    false
+    candidate != "." and !candidate.match?(/\d/)
   end
 
   def is_valid?(map, from, to, y)

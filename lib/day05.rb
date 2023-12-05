@@ -20,7 +20,7 @@ class Almanac
   end
 
   def to_s
-    "Almanac #{@destination} #{@source} #{@range}"
+    "Almanac #{@destinations} #{@sources} #{@ranges}"
   end
 end
 

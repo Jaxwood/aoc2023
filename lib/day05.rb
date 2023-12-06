@@ -1,28 +1,51 @@
 # frozen_string_literal: true
 
+# Stores a rule
+class Rule
+  def initialize(from, to, offset)
+    @from = to
+    @to = to + offset - 1
+    @offset = from - to
+  end
+
+  def transform(seed)
+    seed + @offset
+  end
+
+  def within_range?(seed)
+    seed.between?(@from, @to)
+  end
+
+  def to_s
+    "#{@from}-#{@to} -> #{@offset}"
+  end
+
+  private
+
+  def outside_range?(seed)
+    seed.begin < rule || seed.end > @to
+  end
+
+  def overlaps?(seed)
+    seed.begin < rule && seed.end > @to
+  end
+end
+
 # Stores agricultral data
 class Almanac
-  def initialize(destinations, sources, ranges)
-    @from = sources
-    @to = sources.map.with_index do |source, index|
-      source + ranges[index]
-    end
-    @offset = destinations.map.with_index do |destination, index|
-      destination - sources[index]
-    end
+  def initialize(rules)
+    @rules = rules
   end
 
   def get_seed(seed)
-    @from.each_with_index do |from, index|
-      return seed + @offset[index] if seed.between?(from, @to[index])
+    @rules.each do |rule|
+      return rule.transform(seed) if rule.within_range?(seed)
     end
     seed
   end
 
   def to_s
-    @from.each_with_index do |from, index|
-      puts "#{from} to #{@to[index]} with offset #{@offset[index]}"
-    end
+    @rules.join("\n")
   end
 end
 
@@ -59,6 +82,12 @@ class Day05
     [destination, source, range]
   end
 
+  def parse_rule(sections)
+    sections[0].zip(sections[1], sections[2]).map do |rule|
+      Rule.new(rule[0], rule[1], rule[2])
+    end
+  end
+
   def parse(filename)
     File.open(filename, 'r') do |file|
       line = file.readline
@@ -66,19 +95,19 @@ class Day05
       file.readline # skip blank line
 
       sections = parse_section(file, 'seed-to-soil map')
-      @seed = Almanac.new(sections[0], sections[1], sections[2])
+      @seed = Almanac.new(parse_rule(sections))
       sections = parse_section(file, 'soil-to-fertilizer map')
-      @soil = Almanac.new(sections[0], sections[1], sections[2])
+      @soil = Almanac.new(parse_rule(sections))
       sections = parse_section(file, 'fertilizer-to-water map')
-      @fertilizer = Almanac.new(sections[0], sections[1], sections[2])
+      @fertilizer = Almanac.new(parse_rule(sections))
       sections = parse_section(file, 'water-to-light map')
-      @water = Almanac.new(sections[0], sections[1], sections[2])
+      @water = Almanac.new(parse_rule(sections))
       sections = parse_section(file, 'light-to-temperature map')
-      @light = Almanac.new(sections[0], sections[1], sections[2])
+      @light = Almanac.new(parse_rule(sections))
       sections = parse_section(file, 'temperature-to-humidity map')
-      @temperature = Almanac.new(sections[0], sections[1], sections[2])
+      @temperature = Almanac.new(parse_rule(sections))
       sections = parse_section(file, 'humidity-to-location map')
-      @humidity = Almanac.new(sections[0], sections[1], sections[2])
+      @humidity = Almanac.new(parse_rule(sections))
     end
   end
 

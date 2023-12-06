@@ -3,24 +3,28 @@
 # Stores agricultral data
 class Almanac
   def initialize(destinations, sources, ranges)
-    @sources = sources
-    @destinations = destinations
-    @ranges = ranges
+    @from = sources
+    @to = []
+    sources.each_with_index do |source, index|
+      @to << source + ranges[index]
+    end
+    @offset = []
+    destinations.each_with_index do |destination, index|
+      @offset << destination - sources[index]
+    end
   end
 
   def get_seed(seed)
-    result = seed
-    @sources.each_with_index do |source, index|
-      if source + @ranges[index] > seed && source <= seed
-        offset = seed - source
-        result = @destinations[index] + offset
-      end
+    @from.each_with_index do |from, index|
+      return seed + @offset[index] if seed.between?(from, @to[index])
     end
-    result
+    seed
   end
 
   def to_s
-    "Almanac #{@destinations} #{@sources} #{@ranges}"
+    @from.each_with_index do |from, index|
+      puts "#{from} to #{@to[index]} with offset #{@offset[index]}"
+    end
   end
 end
 
@@ -92,25 +96,6 @@ class Day05
       temperature = @light.get_seed(light)
       humidity = @temperature.get_seed(temperature)
       locations << @humidity.get_seed(humidity)
-    end
-
-    locations.min
-  end
-
-  def part2(filename)
-    parse(filename)
-    locations = []
-
-    @seeds.each_slice(2) do |seeds|
-      (seeds[0]..(seeds[0] + seeds[1])).each do |seed|
-        soil = @seed.get_seed(seed)
-        fertilizer = @soil.get_seed(soil)
-        water = @fertilizer.get_seed(fertilizer)
-        light = @water.get_seed(water)
-        temperature = @light.get_seed(light)
-        humidity = @temperature.get_seed(temperature)
-        locations << @humidity.get_seed(humidity)
-      end
     end
 
     locations.min

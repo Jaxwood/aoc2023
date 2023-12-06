@@ -4,13 +4,11 @@
 class Almanac
   def initialize(destinations, sources, ranges)
     @from = sources
-    @to = []
-    sources.each_with_index do |source, index|
-      @to << source + ranges[index]
+    @to = sources.map.with_index do |source, index|
+      source + ranges[index]
     end
-    @offset = []
-    destinations.each_with_index do |destination, index|
-      @offset << destination - sources[index]
+    @offset = destinations.map.with_index do |destination, index|
+      destination - sources[index]
     end
   end
 

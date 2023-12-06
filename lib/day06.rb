@@ -23,7 +23,7 @@ class Day06
       time = race[0]
       distance = race[1]
       total = 0
-      1..time.times do |second|
+      time.times do |second|
         total += 1 if (second * (time - second)) > distance
       end
       winners << total
@@ -36,7 +36,7 @@ class Day06
     time = race[0]
     distance = race[1]
     total = 0
-    1..time.times do |second|
+    time.times do |second|
       total += 1 if (second * (time - second)) > distance
     end
     total

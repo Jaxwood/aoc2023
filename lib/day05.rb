@@ -96,4 +96,23 @@ class Day05
 
     locations.min
   end
+
+  def part2(filename)
+    parse(filename)
+    locations = []
+
+    @seeds.each_slice(2) do |seeds|
+      (seeds[0]..(seeds[0] + seeds[1])).each do |seed|
+        soil = @seed.get_seed(seed)
+        fertilizer = @soil.get_seed(soil)
+        water = @fertilizer.get_seed(fertilizer)
+        light = @water.get_seed(water)
+        temperature = @light.get_seed(light)
+        humidity = @temperature.get_seed(temperature)
+        locations << @humidity.get_seed(humidity)
+      end
+    end
+
+    locations.min
+  end
 end

@@ -81,13 +81,7 @@ end
 
 class Day05
   def initialize
-    @seed = nil
-    @soil = nil
-    @fertilizer = nil
-    @water = nil
-    @light = nil
-    @temperature = nil
-    @humidity = nil
+    @pipeline = []
     @seeds = []
   end
 
@@ -125,53 +119,38 @@ class Day05
       file.readline # skip blank line
 
       sections = parse_section(file, 'seed-to-soil map')
-      @seed = Almanac.new(parse_rule(sections))
+      seed = Almanac.new(parse_rule(sections))
       sections = parse_section(file, 'soil-to-fertilizer map')
-      @soil = Almanac.new(parse_rule(sections))
+      soil = Almanac.new(parse_rule(sections))
       sections = parse_section(file, 'fertilizer-to-water map')
-      @fertilizer = Almanac.new(parse_rule(sections))
+      fertilizer = Almanac.new(parse_rule(sections))
       sections = parse_section(file, 'water-to-light map')
-      @water = Almanac.new(parse_rule(sections))
+      water = Almanac.new(parse_rule(sections))
       sections = parse_section(file, 'light-to-temperature map')
-      @light = Almanac.new(parse_rule(sections))
+      light = Almanac.new(parse_rule(sections))
       sections = parse_section(file, 'temperature-to-humidity map')
-      @temperature = Almanac.new(parse_rule(sections))
+      temperature = Almanac.new(parse_rule(sections))
       sections = parse_section(file, 'humidity-to-location map')
-      @humidity = Almanac.new(parse_rule(sections))
+      humidity = Almanac.new(parse_rule(sections))
+      @pipeline = [seed, soil, fertilizer, water, light, temperature, humidity]
     end
   end
 
   def part1(filename)
     parse(filename)
     locations = []
-
     @seeds.each do |seed|
-      soil = @seed.get_seed(seed)
-      fertilizer = @soil.get_seed(soil)
-      water = @fertilizer.get_seed(fertilizer)
-      light = @water.get_seed(water)
-      temperature = @light.get_seed(light)
-      humidity = @temperature.get_seed(temperature)
-      locations << @humidity.get_seed(humidity)
+      locations << @pipeline.reduce(seed) { |acc, almanac| almanac.get_seed(acc) }
     end
-
     locations.min
   end
 
   def part2(filename)
     parse(filename)
     locations = []
-
     @seeds.each_slice(2) do |seed|
-      soil = @seed.get_seed_with_range([seed[0]...seed[0] + seed[1]])
-      fertilizer = @soil.get_seed_with_range(soil)
-      water = @fertilizer.get_seed_with_range(fertilizer)
-      light = @water.get_seed_with_range(water)
-      temperature = @light.get_seed_with_range(light)
-      humidity = @temperature.get_seed_with_range(temperature)
-      locations << @humidity.get_seed_with_range(humidity)
+      locations << @pipeline.reduce([seed[0]...seed[0] + seed[1]]) { |acc, almanac| almanac.get_seed_with_range(acc) }
     end
-
     locations.flatten.map(&:begin).min
   end
 end

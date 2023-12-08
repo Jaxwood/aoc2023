@@ -42,21 +42,12 @@ class Day05Test < Minitest::Test
     assert_equal(false, sut.superset?(2...8))
   end
 
-  def test_rule_overlaps
-    sut = Rule.new(0, 2, 4) # 2,3,4,5
-
-    assert_equal(true, sut.overlaps?(1...3))
-    assert_equal(true, sut.overlaps?(4...6))
-    assert_equal(false, sut.overlaps?(1...2))
-    assert_equal(false, sut.overlaps?(6...7))
-  end
-
-  def test_rule_split
+  def test_rule_split_range
     sut = Rule.new(20, 5, 10) # 5,6,7,8,9,10,11,12,13,14
 
-    assert_equal([1...5, 20...25], sut.split(1...10)) # 1,2,3,4;5,6,7,8,9
-    assert_equal([25...30, 15...20], sut.split(10...20)) # 10,11,12,13,14;15,16,17,18,19
-    assert_equal([1...5, 20...30, 15...20], sut.split(1...20)) # 1,2,3,4;5,6,7,8,9;10,11,12,13,14;15,16,17,18,19
+    assert_equal([1...5, 20...25], sut.split_range(1...10)) # 1,2,3,4;5,6,7,8,9
+    assert_equal([25...30, 15...20], sut.split_range(10...20)) # 10,11,12,13,14;15,16,17,18,19
+    assert_equal([1...5, 20...30, 15...20], sut.split_range(1...20)) # 1,2,3,4;5,6,7,8,9;10,11,12,13,14;15,16,17,18,19
   end
 
   def test_day05_part1

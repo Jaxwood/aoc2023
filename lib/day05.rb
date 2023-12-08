@@ -7,23 +7,23 @@ class Rule
     @offset = from - to
   end
 
-  def split(seed_range)
-    if within_range?(seed_range.begin)
+  def split_range(seed_range)
+    if superset?(seed_range)
+      [(transform(seed_range.begin)...transform(seed_range.end))]
+    elsif subset?(seed_range)
+      [(seed_range.begin...@range.begin), (transform(@range.begin)...transform(@range.end)),
+       (@range.end...seed_range.end)]
+    elsif within_range?(seed_range.begin)
       [(transform(seed_range.begin)...transform(@range.end)), (@range.end...seed_range.end)]
     elsif within_range?(seed_range.end - 1)
       [(seed_range.begin...@range.begin), (transform(@range.begin)...transform(seed_range.end))]
-    else # @range is subset of seed_range
-      [(seed_range.begin...@range.begin), (transform(@range.begin)...transform(@range.end)),
-       (@range.end...seed_range.end)]
+    else
+      []
     end
   end
 
   def superset?(seed_range)
     within_range?(seed_range.begin) && within_range?(seed_range.end - 1)
-  end
-
-  def overlaps?(seed_range)
-    within_range?(seed_range.begin) || within_range?(seed_range.end - 1)
   end
 
   def subset?(seed_range)
@@ -39,7 +39,7 @@ class Rule
   end
 
   def to_s
-    "#{@range.begin}-#{@range.end - 1} -> #{@offset}"
+    "#{@range.begin}-#{@range.end} -> #{@offset}"
   end
 end
 
@@ -61,19 +61,14 @@ class Almanac
     seed_ranges.each do |seed_range|
       ranges = []
       @rules.each do |rule|
-        if rule.superset?(seed_range)
-          ranges << (rule.transform(seed_range.begin)...rule.transform(seed_range.end))
-        elsif rule.subset?(seed_range)
-          ranges << rule.split(seed_range).flatten
-        elsif rule.overlaps?(seed_range)
-          ranges << rule.split(seed_range).flatten
-        end
+        result = rule.split_range(seed_range)
+        ranges << result unless result.empty?
       end
       # no rule were applied
       new_ranges << if ranges.empty?
                       seed_range
                     else
-                      ranges.flatten
+                      ranges
                     end
     end
     new_ranges.flatten

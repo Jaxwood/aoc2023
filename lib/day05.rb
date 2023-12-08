@@ -3,31 +3,43 @@
 # Stores a rule
 class Rule
   def initialize(from, to, offset)
-    @from = to
-    @to = to + offset - 1
+    @range = to...(to + offset)
     @offset = from - to
+  end
+
+  def split(seed_range)
+    if within_range?(seed_range.begin)
+      [(transform(seed_range.begin)...transform(@range.end)), (@range.end...seed_range.end)]
+    elsif within_range?(seed_range.end - 1)
+      [(seed_range.begin...@range.begin), (transform(@range.begin)...transform(seed_range.end))]
+    else # @range is subset of seed_range
+      [(seed_range.begin...@range.begin), (transform(@range.begin)...transform(@range.end)),
+       (@range.end...seed_range.end)]
+    end
+  end
+
+  def superset?(seed_range)
+    within_range?(seed_range.begin) && within_range?(seed_range.end - 1)
+  end
+
+  def overlaps?(seed_range)
+    within_range?(seed_range.begin) || within_range?(seed_range.end - 1)
+  end
+
+  def subset?(seed_range)
+    seed_range.begin <= @range.begin && seed_range.end >= @range.end
+  end
+
+  def within_range?(seed)
+    @range.include?(seed)
   end
 
   def transform(seed)
     seed + @offset
   end
 
-  def within_range?(seed)
-    seed.between?(@from, @to)
-  end
-
   def to_s
-    "#{@from}-#{@to} -> #{@offset}"
-  end
-
-  private
-
-  def outside_range?(seed)
-    seed.begin < rule || seed.end > @to
-  end
-
-  def overlaps?(seed)
-    seed.begin < rule && seed.end > @to
+    "#{@range.begin}-#{@range.end - 1} -> #{@offset}"
   end
 end
 
@@ -42,6 +54,29 @@ class Almanac
       return rule.transform(seed) if rule.within_range?(seed)
     end
     seed
+  end
+
+  def get_seed_with_range(seed_ranges)
+    new_ranges = []
+    seed_ranges.each do |seed_range|
+      ranges = []
+      @rules.each do |rule|
+        if rule.superset?(seed_range)
+          ranges << (rule.transform(seed_range.begin)...rule.transform(seed_range.end))
+        elsif rule.subset?(seed_range)
+          ranges << rule.split(seed_range).flatten
+        elsif rule.overlaps?(seed_range)
+          ranges << rule.split(seed_range).flatten
+        end
+      end
+      # no rule were applied
+      new_ranges << if ranges.empty?
+                      seed_range
+                    else
+                      ranges.flatten
+                    end
+    end
+    new_ranges.flatten
   end
 
   def to_s
@@ -126,5 +161,22 @@ class Day05
     end
 
     locations.min
+  end
+
+  def part2(filename)
+    parse(filename)
+    locations = []
+
+    @seeds.each_slice(2) do |seed|
+      soil = @seed.get_seed_with_range([seed[0]...seed[0] + seed[1]])
+      fertilizer = @soil.get_seed_with_range(soil)
+      water = @fertilizer.get_seed_with_range(fertilizer)
+      light = @water.get_seed_with_range(water)
+      temperature = @light.get_seed_with_range(light)
+      humidity = @temperature.get_seed_with_range(temperature)
+      locations << @humidity.get_seed_with_range(humidity)
+    end
+
+    locations.flatten.map(&:begin).min
   end
 end

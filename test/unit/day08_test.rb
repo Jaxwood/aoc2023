@@ -16,9 +16,21 @@ class Day08Test < Minitest::Test
     assert_equal(6, sut.part1)
   end
 
+  def test_day08c
+    sut = Day08.new
+    sut.load('data/day08c.txt')
+    assert_equal(6, sut.part2)
+  end
+
   def test_day08_part1
     sut = Day08.new
     sut.load('data/day08.txt')
     assert_equal(23_147, sut.part1)
+  end
+
+  def test_day08_part2
+    sut = Day08.new
+    sut.load('data/day08.txt')
+    assert_equal(22_289_513_667_691, sut.part2)
   end
 end

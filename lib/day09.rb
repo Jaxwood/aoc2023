@@ -6,33 +6,33 @@ class Day09
     @history = File.readlines(file).map { |line| line.split(' ') }.map { |line| line.map(&:to_i) }
   end
 
-  def succ(line)
-    return 0 if line.all?(&:zero?)
+  def succ(history)
+    return 0 if history.all?(&:zero?)
 
     difference = []
-    line.each_cons(2) do |a, b|
+    history.each_cons(2) do |a, b|
       difference.push(b - a)
     end
 
     difference.last + succ(difference)
   end
 
-  def pred(line)
-    return 0 if line.all?(&:zero?)
+  def pred(history)
+    return 0 if history.all?(&:zero?)
 
     difference = []
-    line.each_cons(2) do |a, b|
+    history.each_cons(2) do |a, b|
       difference.push(b - a)
     end
 
-    line.first - pred(difference)
+    history.first - pred(difference)
   end
 
   def part1
-    @history.map { |line| line.last + succ(line) }.sum
+    @history.map { |history| history.last + succ(history) }.sum
   end
 
   def part2
-    @history.map { |line| pred(line) }.sum
+    @history.map { |history| pred(history) }.sum
   end
 end

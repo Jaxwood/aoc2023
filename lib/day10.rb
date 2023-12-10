@@ -42,8 +42,6 @@ class Navigator
                                                .filter { |neighbor| @map[neighbor] != '.' }
                                                .filter { |neighbor| find_next_move(neighbor).include?(position) }
 
-    raise "Expected 2 neighbors, got #{possible_moves.length}" if possible_moves.length != 2
-
     if possible_moves.include?(north) && possible_moves.include?(west)
       @map[position] = 'J'
     elsif possible_moves.include?(north) && possible_moves.include?(east)

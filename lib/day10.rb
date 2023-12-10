@@ -8,10 +8,9 @@ class Navigator
 
   def find_farthest_point
     position = @map.key('S')
-    mutate_start(position)
-    queue = []
-    queue.push(find_next_move(position))
     visited = Set.new(position)
+    mutate_start(position)
+    queue = [find_next_move(position)]
 
     # visit every node in the loop
     while queue.any?

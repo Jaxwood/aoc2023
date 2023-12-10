@@ -12,12 +12,10 @@ class Navigator
     queue = []
     queue.push(find_next_move(position))
     visited = Set.new(position)
-    iterations = 0
 
     # visit every node in the loop
     while queue.any?
       candidates = queue.shift
-      iterations += 1
 
       candidates.each do |candidate|
         next if visited.include?(candidate)
@@ -27,7 +25,7 @@ class Navigator
       end
     end
 
-    iterations / 2
+    visited.to_a
   end
 
   private
@@ -107,6 +105,7 @@ class Day10
   end
 
   def part1
-    Navigator.new(parse).find_farthest_point
+    # start position should not count
+    (Navigator.new(parse).find_farthest_point.length - 1) / 2
   end
 end

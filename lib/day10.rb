@@ -6,7 +6,7 @@ class Navigator
     @map = map
   end
 
-  def find_farthest_point
+  def route
     position = @map.key('S')
     visited = Set.new(position)
     mutate_start(position)
@@ -103,6 +103,6 @@ class Day10
 
   def part1
     # start position should not count
-    (Navigator.new(parse).find_farthest_point.length - 1) / 2
+    (Navigator.new(parse).route.length - 1) / 2
   end
 end

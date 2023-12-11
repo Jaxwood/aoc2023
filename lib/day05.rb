@@ -3,31 +3,16 @@
 # Stores a rule
 class Rule
   def initialize(from, to, offset)
-    @range = to...(to + offset)
+    @range = to..(to + offset)
     @offset = from - to
   end
 
-  def split_range(seed_range)
-    if superset?(seed_range)
-      [(transform(seed_range.begin)...transform(seed_range.end))]
-    elsif subset?(seed_range)
-      [(seed_range.begin...@range.begin), (transform(@range.begin)...transform(@range.end)),
-       (@range.end...seed_range.end)]
-    elsif within_range?(seed_range.begin)
-      [(transform(seed_range.begin)...transform(@range.end)), (@range.end...seed_range.end)]
-    elsif within_range?(seed_range.end - 1)
-      [(seed_range.begin...@range.begin), (transform(@range.begin)...transform(seed_range.end))]
-    else
-      []
-    end
-  end
+  attr_reader :range, :offset
 
-  def superset?(seed_range)
-    within_range?(seed_range.begin) && within_range?(seed_range.end - 1)
-  end
+  def overlapping(other)
+    return unless other.begin <= @range.end && @range.begin <= other.end
 
-  def subset?(seed_range)
-    seed_range.begin <= @range.begin && seed_range.end >= @range.end
+    ([@range.begin, other.begin].max..[@range.end, other.end].min)
   end
 
   def within_range?(seed)
@@ -49,6 +34,8 @@ class Almanac
     @rules = rules
   end
 
+  attr_reader :rules
+
   def get_seed(seed)
     @rules.each do |rule|
       return rule.transform(seed) if rule.within_range?(seed)
@@ -56,23 +43,7 @@ class Almanac
     seed
   end
 
-  def get_seed_with_range(seed_ranges)
-    new_ranges = []
-    seed_ranges.each do |seed_range|
-      ranges = []
-      @rules.each do |rule|
-        result = rule.split_range(seed_range)
-        ranges << result unless result.empty?
-      end
-      # no rule were applied
-      new_ranges << if ranges.empty?
-                      seed_range
-                    else
-                      ranges
-                    end
-    end
-    new_ranges.flatten
-  end
+  def get_seed_with_range(seed_ranges); end
 
   def to_s
     @rules.join("\n")
@@ -147,10 +118,28 @@ class Day05
 
   def part2(filename)
     parse(filename)
-    locations = []
-    @seeds.each_slice(2) do |seed|
-      locations << @pipeline.reduce([seed[0]...seed[0] + seed[1]]) { |acc, almanac| almanac.get_seed_with_range(acc) }
+    seeds = @seeds.each_slice(2).map { |seed| (seed[0]..seed[0] + seed[1]) }
+
+    @pipeline.reduce(seeds) do |acc, almanac|
+      acc.flat_map do |seed|
+        locations = []
+        curr = seed.begin
+
+        almanac.rules
+               .sort_by { |rule| rule.range.begin }
+               .each do |rule|
+                 new_range = rule.overlapping(seed)
+                 next unless new_range
+
+                 locations << ((new_range.begin + rule.offset)..(new_range.end + rule.offset))
+                 curr = new_range.end + 1
+               end
+
+        locations << (curr..seed.end) if curr < seed.end
+
+        locations
+      end
     end
-    locations.flatten.map(&:begin).min
+      .map(&:begin).min
   end
 end

@@ -8,7 +8,7 @@ class Navigator
 
   def route
     position = @map.key('S')
-    visited = Set.new(position)
+    visited = Set.new([position])
     mutate_start(position)
     queue = [find_next_move(position)]
 
@@ -24,7 +24,7 @@ class Navigator
       end
     end
 
-    visited.to_a
+    visited
   end
 
   private
@@ -102,7 +102,23 @@ class Day10
   end
 
   def part1
-    # start position should not count
-    (Navigator.new(parse).route.length - 1) / 2
+    Navigator.new(parse).route.length / 2
+  end
+
+  def part2
+    route = Navigator.new(parse).route
+    tiles = ['J', '|', 'L']
+    result = 0
+    @lines.each_with_index do |line, y|
+      open = false
+      line.chomp.chars.each_with_index do |char, x|
+        if route.include?([x, y])
+          open = !open if tiles.include?(char)
+        elsif open
+          result += 1
+        end
+      end
+    end
+    result
   end
 end

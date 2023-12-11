@@ -52,7 +52,7 @@ class Day11
   end
 
   def part1
-    Space.new(parse, 1).galaxies
+    Space.new(parse).galaxies
   end
 
   def part2(factor)

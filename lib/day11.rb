@@ -2,20 +2,11 @@
 
 # Store information about the galaxies
 class Space
-  def initialize(map)
+  def initialize(map, factor = 1)
     @map = map
-    @expanded_xs = []
-    @expanded_ys = []
-
-    x_max = map.keys.map(&:first).max
-    (0..x_max).each do |x|
-      @expanded_xs << x if @map.filter { |k, _v| k.first == x }.values.all? { |v| v == '.' }
-    end
-
-    y_max = map.keys.map(&:last).max
-    (0..y_max).each do |y|
-      @expanded_ys << y if @map.filter { |k, _v| k.last == y }.values.all? { |v| v == '.' }
-    end
+    @factor = factor > 1 ? factor - 1 : factor
+    @expanded_xs = expand_axis(:first)
+    @expanded_ys = expand_axis(:last)
   end
 
   def galaxies
@@ -25,14 +16,22 @@ class Space
 
   private
 
+  def expand_axis(axis)
+    max = @map.keys.map(&axis).max
+    result = []
+    (0..max).each do |value|
+      result << value if @map.filter { |k, _v| k.send(axis) == value }.values.all? { |v| v == '.' }
+    end
+    result
+  end
+
   def manhattan_distance(a, b)
     (a[0] - b[0]).abs + (a[1] - b[1]).abs + expanded_distance(a, b)
   end
 
   def expanded_distance(a, b)
-    x_expanded = @expanded_xs.filter { |x| x.between?([a[0], b[0]].min, [a[0], b[0]].max) }.count
-    y_expanded = @expanded_ys.filter { |y| y.between?([a[1], b[1]].min, [a[1], b[1]].max) }.count
-    x_expanded + y_expanded
+    (@expanded_xs.filter { |x| x.between?([a[0], b[0]].min, [a[0], b[0]].max) }.count * @factor) +
+      (@expanded_ys.filter { |y| y.between?([a[1], b[1]].min, [a[1], b[1]].max) }.count * @factor)
   end
 end
 
@@ -53,6 +52,10 @@ class Day11
   end
 
   def part1
-    Space.new(parse).galaxies
+    Space.new(parse, 1).galaxies
+  end
+
+  def part2(factor)
+    Space.new(parse, factor).galaxies
   end
 end

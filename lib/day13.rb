@@ -47,23 +47,49 @@ class Day13
       end
     end
 
-    return 0 if result.empty?
+    return [] if result.empty?
 
     if horizontal
-      result.max * 100
+      result.map { |x| x * 100 }
     else
-      result.max
+      result
     end
+  end
+
+  def smudge(grid)
+    (grid.count - 1)
+      .times
+      .map do |y|
+        left = grid[0..y].reverse
+        right = grid[y + 1..]
+
+        errors = left.zip(right).select(&:last).sum do |l, r|
+          l.zip(r).count { _1 != _2 }
+        end
+
+        left.count if errors == 1
+      end
+      .compact
+      .first
   end
 
   def part1
     total = 0
     valleys = parse
-    valleys.each_with_index do |valley, _idx|
-      sum = mirrors(valley)
-      sum = mirrors(valley.transpose, horizontal: true) if sum.zero?
-      total += sum
+    valleys.each do |valley|
+      result = mirrors(valley)
+      result = mirrors(valley.transpose, horizontal: true) if result.empty?
+      total += result.max if result.any?
     end
     total
+  end
+
+  def part2
+    @maps
+      .map do |pattern|
+        grid = pattern.each_line.map(&:strip).map(&:chars)
+        smudge(grid.transpose) || smudge(grid) * 100
+      end
+      .sum
   end
 end

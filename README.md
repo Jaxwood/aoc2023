@@ -4,8 +4,15 @@
 
 # Setup
 
+Install Ruby using [rtx](https://github.com/jdx/rtx)
+
+```sh
+rtx install ruby
 Run `bundle install`
+```
 
 # Testing
 
-Run `rake test` 
+```sh
+rake test
+```

@@ -8,14 +8,18 @@ class Day15
     @sequence = File.read(file).split(',').map(&:strip)
   end
 
+  def box_no(candidate)
+    val = 0
+    candidate.chars.each do |c|
+      val = ((val + c.ord) * 17) % 256
+    end
+    val
+  end
+
   def part1
     results = []
     @sequence.each do |s|
-      val = 0
-      s.chars.each do |c|
-        val = ((val + c.ord) * 17) % 256
-      end
-      results.push(val)
+      results.push(box_no(s))
     end
     results.sum
   end

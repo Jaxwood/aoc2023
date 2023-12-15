@@ -8,7 +8,7 @@ Install Ruby using [rtx](https://github.com/jdx/rtx)
 
 ```sh
 rtx install ruby
-Run `bundle install`
+bundle install
 ```
 
 # Testing

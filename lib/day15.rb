@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'base64'
-
 # Day15
 class Day15
   def load(file)
@@ -22,5 +20,33 @@ class Day15
       results.push(box_no(s))
     end
     results.sum
+  end
+
+  def part2
+    boxes = {}
+    label_map = {}
+    @sequence.each do |s|
+      parts = s.split(/[=-]/)
+      label = parts[0]
+      label_map[label] = parts[1].to_i if s.include?('=')
+      no = box_no(label).to_i
+      box = boxes.fetch(no, [])
+
+      if s.include?('=')
+        box.push(label) unless box.include?(label)
+      elsif s.include?('-')
+        box.delete(label)
+      end
+
+      boxes[no] = box
+    end
+
+    total = 0
+    boxes.each do |k, v|
+      v.each_with_index do |l, i|
+        total += label_map[l] * (i + 1) * (k + 1)
+      end
+    end
+    total
   end
 end

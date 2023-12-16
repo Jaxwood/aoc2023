@@ -36,8 +36,6 @@ class Day16
   end
 
   def part1(start, facing)
-    best = 0
-    iterations = 0
     visited = Set.new([[start, facing]])
     queue = []
 
@@ -46,7 +44,6 @@ class Day16
     end
 
     while queue.any?
-      iterations += 1
       ((x, y), direction) = queue.shift
       move = case direction
              when :east
@@ -64,7 +61,7 @@ class Day16
       next unless @map.key?(move)
 
       @direction_map[[@map[move], direction]].each do |new_direction|
-        if !visited.include?([move, new_direction])
+        unless visited.include?([move, new_direction])
           queue << [move, new_direction]
           visited << [move, new_direction]
         end

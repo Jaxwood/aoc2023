@@ -20,7 +20,7 @@ class Day16Test < Minitest::Test
     assert_equal(7884, sut.part1([0, 0], :east))
   end
 
-  def _test_day16_part2
+  def test_day16_part2
     sut = Day16.new
     sut.load('data/day16.txt')
     assert_equal(8185, sut.part2)

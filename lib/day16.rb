@@ -35,12 +35,15 @@ class Day16
     }
   end
 
-  def part1
-    start = [0, 0]
+  def part1(start, facing)
     best = 0
-    queue = [[start, @direction_map[[@map[start], :east]].first]]
-    visited = Set.new
     iterations = 0
+    visited = Set.new
+    queue = []
+
+    @direction_map[[@map[start], facing]].each do |direction|
+      queue << [start, direction]
+    end
 
     while queue.any?
       iterations += 1
@@ -65,8 +68,9 @@ class Day16
         queue << [move, new_direction]
       end
 
-      next unless iterations % 1000000 == 0
+      next unless (iterations % 1_000_000).zero?
       return best if best == visited.length
+
       best = visited.length
     end
     best

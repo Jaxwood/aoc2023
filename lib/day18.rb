@@ -26,6 +26,24 @@ class Day18
     end
   end
 
+  # area of a polygon
+  def area(coordinates)
+    n = coordinates.length
+    area = 0
+    perimeter = 0
+
+    (0..n - 1).each do |i|
+      x1, y1 = coordinates[i]
+      x2, y2 = coordinates[(i + 1) % n]
+
+      area += (x1 * y2 - x2 * y1)
+      perimeter += Math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    end
+
+    area = area.abs / 2.0
+    (area + (perimeter / 2.0) + 1).to_i
+  end
+
   def part1
     dig = {}
     cursor = [0, 0]
@@ -57,5 +75,31 @@ class Day18
     end
     fill(dig)
     dig.keys.count
+  end
+
+  def part2
+    coords = [[0, 0]]
+    @lines.each do |line|
+      segments = line.split(' ')
+      size = segments[2][2..-3].hex.to_i
+      direction = segments[2][2..-2][-1].to_i
+      coords << case direction
+                when 0 # right
+                  cursor = coords[-1]
+                  [cursor[0] + size, cursor[1]]
+                when 1 # down
+                  cursor = coords[-1]
+                  [cursor[0], cursor[1] + size]
+                when 2 # left
+                  cursor = coords[-1]
+                  [cursor[0] - size, cursor[1]]
+                when 3 # up
+                  cursor = coords[-1]
+                  [cursor[0], cursor[1] - size]
+                else
+                  raise "Unknown direction #{direction}"
+                end
+    end
+    area(coords)
   end
 end

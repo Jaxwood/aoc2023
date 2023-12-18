@@ -29,13 +29,14 @@ class State
     # Can't move to the origin
     return nil if [@dx + x, @dy + y] == [0, 0]
 
-    # limit of 3 moves on a line
+    # apply move constraints
     moves = 1
     if relative == [@dx, @dy]
       moves = @moves + 1
-    elsif moves < min
+    elsif @moves < min
       return nil
     end
+
     return nil if moves > max
 
     State.new(to, relative, moves, @total + map.fetch(to, 0))
@@ -74,10 +75,12 @@ class Day17
   end
 
   def part1(min, max)
-    start = State.new([0, 0], [0, 0], 0, 0)
+    # we can only move right or down from the start
+    right = State.new([0, 0], [1, 0], 0, 0)
+    down = State.new([0, 0], [0, 1], 0, 0)
     finish = [@map.keys.max_by { |k| k[0] }[0], @map.keys.max_by { |k| k[1] }[1]]
 
-    queue = [start]
+    queue = [right, down]
     visited = Set.new
 
     while queue.any?

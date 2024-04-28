@@ -20,3 +20,9 @@ bundle install
 ```sh
 rake test
 ```
+
+Run the tests for a specific day
+
+```sh
+rake test TEST=test/unit/day01_test.rb
+```

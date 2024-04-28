@@ -4,7 +4,7 @@
 
 # Setup
 
-Install Ruby using [rtx](https://github.com/jdx/rtx)
+Install Ruby using [mise](https://github.com/jdx/mise)
 
 ```sh
 rtx install ruby

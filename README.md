@@ -7,7 +7,7 @@
 Install Ruby using [mise](https://github.com/jdx/mise)
 
 ```sh
-rtx install ruby
+mise install ruby
 ```
 Install dependencies
 

@@ -61,7 +61,7 @@ class Day24
           x, y = part.intersection_point(other_part)
           # check if the intersection point is in the test grid
           if x.between?(@min, @max) && y.between?(@min, @max)
-            result << part.intersection_point(other_part)
+            result << [x, y]
           end
         end
       end

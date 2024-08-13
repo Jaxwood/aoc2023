@@ -8,6 +8,12 @@ class Day24Test < Minitest::Test
     assert_equal(2, sut.part1)
   end
 
+  def test_day24b
+    sut = Day24.new
+    sut.parse('data/day24a.txt')
+    assert_equal(47, sut.part2)
+  end
+
   def test_day24
     sut = Day24.new
     sut.load('data/day24.txt', 200000000000000, 400000000000000)

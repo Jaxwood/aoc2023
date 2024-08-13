@@ -8,9 +8,9 @@ class Day24Test < Minitest::Test
     assert_equal(2, sut.part1)
   end
 
-  def _test_day24
+  def test_day24
     sut = Day24.new
     sut.load('data/day24.txt', 200000000000000, 400000000000000)
-    assert_equal(14472, sut.part1) # too low
+    assert_equal(18651, sut.part1)
   end
 end

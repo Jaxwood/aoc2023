@@ -1,51 +1,38 @@
 # frozen_string_literal: true
-
 class Line
-  attr_reader :slope, :y_intercept, :x, :y
+  attr_reader :x, :y, :cx, :cy
 
   def initialize(x, y, cx, cy)
-    @x = x
-    @y = y
-    if cx == 0
-      @slope = Float::INFINITY
-      @x_intercept = x
-    else
-      @slope = cy.to_f / cx
-      @y_intercept = y - @slope * x
-    end
+    @x = x.to_f
+    @y = y.to_f
+    @cx = cx.to_f
+    @cy = cy.to_f
   end
 
-  def intersects_with?(other_line)
-    return false if @slope == other_line.slope && @slope != Float::INFINITY
-    return false if @slope == Float::INFINITY && other_line.slope == Float::INFINITY && @x_intercept != other_line.x_intercept
-    true
+  def intersects_forward?(other_line)
+    # Calculate the intersection point
+    denominator = (@cx * other_line.cy - @cy * other_line.cx)
+    return false if denominator == 0 # Lines are parallel
+
+    t = ((other_line.x - @x) * other_line.cy + (y - other_line.y) * other_line.cx) / denominator
+    u = ((other_line.x - @x) * @cy + (y - other_line.y) * @cx) / denominator
+
+    # Check if intersection occurs in the future for both lines
+    t > 0 && u > 0
   end
 
   def intersection_point(other_line)
-    return [0, 0] unless intersects_with?(other_line)
+    denominator = (@cx * other_line.cy - @cy * other_line.cx)
+    return nil if denominator == 0 # Lines are parallel
 
-    if @slope == Float::INFINITY
-      x = @x_intercept
-      y = other_line.slope * x + other_line.y_intercept
-    elsif other_line.slope == Float::INFINITY
-      x = other_line.x_intercept
-      y = @slope * x + @y_intercept
-    else
-      x = (other_line.y_intercept - @y_intercept) / (@slope - other_line.slope)
-      y = @slope * x + @y_intercept
-    end
+    t = ((other_line.x - @x) * other_line.cy + (y - other_line.y) * other_line.cx) / denominator
 
-    [x, y]
-  end
+    return nil unless t > 0 # Intersection is in the past
 
-  def to_s
-    "(#{@x}, #{@y})"
-  end
+    intersection_x = @x + t * @cx
+    intersection_y = @y + t * @cy
 
-  protected
-
-  def x_intercept
-    @x_intercept
+    [intersection_x, intersection_y]
   end
 end
 
@@ -70,11 +57,10 @@ class Day24
       for j in (i + 1)..(@parts.length - 1)
         other_part = @parts[j]
 
-        if part.intersects_with?(other_part)
+        if part.intersects_forward?(other_part)
           x, y = part.intersection_point(other_part)
           # check if the intersection point is in the test grid
           if x.between?(@min, @max) && y.between?(@min, @max)
-            puts "Intersection point: #{x}, #{y} for lines #{part} and #{other_part}"
             result << part.intersection_point(other_part)
           end
         end
@@ -83,3 +69,4 @@ class Day24
     result.length
   end
 end
+

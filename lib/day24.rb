@@ -39,11 +39,7 @@ class Line
   end
 
   def to_s
-    if @slope == Float::INFINITY
-      "x = #{@x_intercept}"
-    else
-      "y = #{@slope}x + #{@y_intercept}"
-    end
+    "(#{@x}, #{@y})"
   end
 
   protected
@@ -78,11 +74,8 @@ class Day24
           x, y = part.intersection_point(other_part)
           # check if the intersection point is in the test grid
           if x.between?(@min, @max) && y.between?(@min, @max)
-            # check if the intersection point is in the future
-            if x > part.x 
-              puts "Intersection point: #{x}, #{y}"
-              result << part.intersection_point(other_part)
-            end
+            puts "Intersection point: #{x}, #{y} for lines #{part} and #{other_part}"
+            result << part.intersection_point(other_part)
           end
         end
       end

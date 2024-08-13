@@ -6,8 +6,8 @@ class Point3D
   attr_reader :x, :y, :z, :cx, :cy, :cz
 
   def initialize(x, y, z, cx, cy, cz)
-    @x, @y, @z = x.to_f, y.to_f, z.to_f
-    @cx, @cy, @cz = cx.to_f, cy.to_f, cz.to_f
+    @x, @y, @z = x, y, z
+    @cx, @cy, @cz = cx, cy, cz
   end
 
   def to_s
@@ -53,29 +53,21 @@ class Line
 end
 
 def find_intersection_point(points)
-  return nil if points.size < 3
+  a = Matrix.build(6, 6) { 0 }
+  b = Vector.elements(Array.new(6, 0))
 
-  a_rows = []
-  b_elements = []
+  4.times do |i|
+    h1, h2 = points[i], points[i+1]
+    a[i, 0], a[i, 1], a[i, 2] = h2.cy - h1.cy, h1.cx - h2.cx, 0
+    a[i, 3], a[i, 4], a[i, 5] = h1.y - h2.y, h2.x - h1.x, 0
+    b[i] = h2.x * h2.cy - h2.y * h2.cx - h1.x * h1.cy + h1.y * h1.cx
 
-  3.times do |i|
-    p1, p2 = points[i], points[(i+1) % 3]
-    
-    d = Vector[p2.cx - p1.cx, p2.cy - p1.cy, p2.cz - p1.cz]
-    n = d.cross_product(Vector[p1.cx, p1.cy, p1.cz])
-    
-    a_rows << n.to_a
-    b_elements << n.dot(Vector[p1.x, p1.y, p1.z])
+    a[i+2, 0], a[i+2, 1], a[i+2, 2] = h2.cz - h1.cz, 0, h1.cx - h2.cx
+    a[i+2, 3], a[i+2, 4], a[i+2, 5] = h1.z - h2.z, 0, h2.x - h1.x
+    b[i+2] = h2.x * h2.cz - h2.z * h2.cx - h1.x * h1.cz + h1.z * h1.cx
   end
 
-  a = Matrix.rows(a_rows)
-  b = Vector.elements(b_elements)
-
-  begin
-    a.inverse * b
-  rescue ExceptionForMatrix::ErrNotRegular
-    return nil
-  end
+  a.inverse * b
 end
 
 # Day24
@@ -123,13 +115,12 @@ class Day24
   end
 
   def part2
-    solution = find_intersection_point(@parts) 
+    solution = find_intersection_point(@parts)
     if solution.nil?
-      return -1
+      -1
     else
-      return soluion[0] + solution[1] + solution[2]
+      solution[0] + solution[1] + solution[2]
     end
-    0
   end
 end
 

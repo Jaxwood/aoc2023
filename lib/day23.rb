@@ -14,6 +14,40 @@ class Forest
     @current_longest
   end
 
+  def longest_path_queue
+    queue = Queue.new
+    queue << [@start, Set.new([@start]), [@start]]
+
+    until queue.empty?
+      current, visited, path = queue.pop
+
+      if current == @goal && path.length > @current_longest
+        @current_longest = path.length - 1
+      else
+        next_positions = case [@forest_map[current], @dry]
+                         when [:right, false]
+                           [[current[0] + 1, current[1]]]
+                         when [:down, false]
+                           [[current[0], current[1] + 1]]
+                         else
+                           neighbors(current)
+                         end
+
+        next_positions.each do |next_pos|
+          next unless @forest_map.key?(next_pos) && !visited.include?(next_pos) && @forest_map[next_pos] != :tree
+
+          new_visited = visited.dup
+          new_visited.add(next_pos)
+          new_path = path.dup
+          new_path << next_pos
+          queue << [next_pos, new_visited, new_path]
+        end
+      end
+    end
+
+    @current_longest
+  end
+
   private
 
   def dfs(current, visited, path)
@@ -78,5 +112,12 @@ class Day23
     goal = find(:end)
     forest = Forest.new(@maze, start, goal)
     forest.find_longest_path
+  end
+
+  def part2
+    start = find(:start)
+    goal = find(:end)
+    forest = Forest.new(@maze, start, goal)
+    forest.longest_path_queue
   end
 end

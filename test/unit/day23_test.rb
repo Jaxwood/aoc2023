@@ -11,6 +11,6 @@ class Day23Test < Minitest::Test
   def test_day23a_part1
     sut = Day23.new
     sut.load('data/day23.txt')
-    assert_equal(2432, sut.part1) # too high
+    assert_equal(2430, sut.part1)
   end
 end

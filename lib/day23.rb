@@ -10,7 +10,7 @@ class Forest
 
   def find_longest_path
     visited = {}
-    dfs(@start, visited, [@start])
+    dfs(@start, visited, [])
     @current_longest
   end
 
@@ -23,21 +23,30 @@ class Forest
     path << current
 
     if current == @goal && path.length > @current_longest
-      @current_longest = path.length
-    elsif @forest_map[current] == :right
-      dfs([current[0] + 1, current[1]], visited, path)
-    elsif @forest_map[current] == :down
-      dfs([current[0], current[1] + 1], visited, path)
+      # initial tile is not counted
+      @current_longest = path.length - 1
     else
-      neighbors(current).each do |neighbor|
-        dfs(neighbor, visited, path)
+      next_positions = case @forest_map[current]
+                       when :right
+                         [[current[0] + 1, current[1]]]
+                       when :down
+                         [[current[0], current[1] + 1]]
+                       else
+                         neighbors(current)
+                       end
+
+      next_positions.each do |next_pos|
+        dfs(next_pos, visited, path)
       end
     end
+
+    visited[current] = false
+    path.pop
   end
 
   def neighbors(position)
     x, y = position
-    [[x, y+1], [x+1, y], [x, y-1], [x-1, y]].select { |pos| @forest_map.key?(pos) }
+    [[x, y + 1], [x + 1, y], [x, y - 1], [x - 1, y]].select { |pos| @forest_map.key?(pos) }
   end
 end
 
@@ -58,22 +67,16 @@ class Day23
     end
   end
 
-  def find_start
+  def find(token)
     @maze.each do |key, value|
-      return key if value == :start
-    end
-  end
-
-  def find_end
-    @maze.each do |key, value|
-      return key if value == :end
+      return key if value == token
     end
   end
 
   def part1
-    x, y = find_start
-    gx, gy = find_end
-    forest = Forest.new(@maze, [x, y], [gx, gy])
+    start = find(:start)
+    goal = find(:end)
+    forest = Forest.new(@maze, start, goal)
     forest.find_longest_path
   end
 end

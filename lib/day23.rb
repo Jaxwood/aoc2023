@@ -24,16 +24,7 @@ class Forest
       if current == @goal && path.length > @current_longest
         @current_longest = path.length - 1
       else
-        next_positions = case [@forest_map[current], @dry]
-                         when [:right, false]
-                           [[current[0] + 1, current[1]]]
-                         when [:down, false]
-                           [[current[0], current[1] + 1]]
-                         else
-                           neighbors(current)
-                         end
-
-        next_positions.each do |next_pos|
+        neighbors(current).each do |next_pos|
           next unless @forest_map.key?(next_pos) && !visited.include?(next_pos) && @forest_map[next_pos] != :tree
 
           new_visited = visited.dup
